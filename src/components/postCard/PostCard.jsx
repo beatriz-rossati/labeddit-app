@@ -8,53 +8,34 @@ import {
     StyledDeletePost,
     StyledEditContent
 } from './PostCardStyle';
-import Likes from '../../assets/likes_icon.svg';
-import Liked from '../../assets/liked_icon.png';
-import Dislikes from '../../assets/dislikes_icon.svg';
-import Disliked from '../../assets/disliked_icon.png';
+import Upvote from '../../assets/upvote_icon.svg';
+import Upvoted from '../../assets/upvoted_icon.png';
+import Downvote from '../../assets/downvote_icon.svg';
+import Downvoted from '../../assets/downvoted_icon.png';
 import Comments from '../../assets/comments_icon.svg';
 import Edit from '../../assets/edit_icon.png';
 import Delete from '../../assets/delete_icon.png';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { BASE_URL, TOKEN } from '../../constants/BASE_URL';
+import { BASE_URL } from '../../constants/BASE_URL';
 import axios from 'axios';
 import { goToFeedPage, goToPostPage } from '../../routes/coordinator';
 import { useNavigate } from 'react-router-dom';
 import { GlobalContext } from '../../context/GlobalContext';
+
 //TODO: Falta fazer esse global context e o "token"
 
 export default function PostCard({ post }) {
-	const { states, setters } = useContext(GlobalContext);
+	const { states, methods } = useContext(GlobalContext);
 
-	const isCurrentUserPostCreator = states.userId === post.creator.id;
+	const isCurrentUserPostCreator = localStorage.getItem("userId") === post.creator.id;
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const [editing, setEditing] = useState(false);
 	const [editedContent, setEditedContent] = useState(post.content);
 	const textareaRef = useRef(null);
-	const [userLike, setUserLike] = useState(null);
+	const [userRating, setUserRating] = useState(null);
 	const navigate = useNavigate();
 
-    //TODO: conferir o uso do useContext e o uso do token
-	const checkLike = async () => {
-		try {
-			const headers = {
-				Authorization: window.localStorage.getItem(TOKEN),
-			};
-			const response = await axios.get(
-				BASE_URL + '/posts/' + post.id + '/checklike',
-				{
-					headers,
-				}
-			);
-			setUserLike(response.data);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	useEffect(() => {
-		checkLike();
-	}, [setters.handleLikeDislikePost]);
+//TODO: colocar na informação do post se ele foi curtido pelo usuário atual
 
 	const handleDeleteClick = (event) => {
 		event.stopPropagation();
@@ -63,7 +44,7 @@ export default function PostCard({ post }) {
 
 	const handleConfirmDelete = async (event) => {
 		event.stopPropagation();
-		await setters.handleDeletePost(post.id);
+		await methods.handleDeletePost(post.id);
 		goToFeedPage(navigate);
 	};
 
@@ -86,13 +67,13 @@ export default function PostCard({ post }) {
 
 	const handleSaveEdit = async (event) => {
 		event.stopPropagation();
-		await setters.handleEditPost(post.id, editedContent);
+		await methods.handleEditPost(post.id, editedContent);
 		setEditing(false);
 	};
 
-	const handleLikeDislike = async (event, like) => {
+	const handleRating = async (event, like) => {
 		event.stopPropagation();
-		await setters.handleLikeDislikePost(post.id, like);
+		await methods.handleRatingPost(post.id, like);
 	};
 
 	useEffect(() => {
@@ -135,15 +116,15 @@ export default function PostCard({ post }) {
 			<StyledLikesAndCommentsSection>
 				<StyledContainer>
 					<img
-						src={userRated === 'like' ? Liked : Likes}
+						src={userRating === 'like' ? Upvoted : Upvote}
 						alt="Like"
-						onClick={(event) => handleLikeDislike(event, true)}
+						onClick={(event) => handleRating(event, true)}
 					/>
 					{post.likes - post.dislikes}
 					<img
-						src={userRated === 'dislike' ? Disliked : Dislikes}
+						src={userRating === 'dislike' ? Downvoted : Downvote}
 						alt="Dislike"
-						onClick={(event) => handleLikeDislike(event, false)}
+						onClick={(event) => handleRating(event, false)}
 					/>
 				</StyledContainer>
 				<StyledContainer>

@@ -5,7 +5,7 @@ import {
 	StyledMainContainer,
 	StyledTitle,
 	StyledForm,
-	StyledButtonsContainer,
+	StyledInputContainer,
 	StyledAgreementContainer,
 	StyledText,
 	StyledSignUpButton,
@@ -17,15 +17,18 @@ import LogoImg from '../../assets/small_logo.svg';
 import { useNavigate } from 'react-router-dom';
 import { goToLoginPage, goToFeedPage } from '../../routes/coordinator';
 import Input from '../../components/input/Input';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { BASE_URL } from '../../constants/BASE_URL';
 import axios from 'axios';
+import { GlobalContext } from '../../context/GlobalContext';
 
 export default function SignUpPage() {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [erro, setErro] = useState(''); 
+	const { states } = useContext(GlobalContext);
+
 
 	const navigate = useNavigate();
 
@@ -37,6 +40,8 @@ export default function SignUpPage() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
+		// TODO: criar loader do botao, quando clicar setar o loader pra true, e não deixar clicar se estiver loading
+
 		try {
 			const body = {
 				name,
@@ -46,13 +51,33 @@ export default function SignUpPage() {
 
 			const response = await axios.post(`${BASE_URL}/users/signup`, body);
 			window.localStorage.setItem("token", response.data.token);
+			localStorage.setItem("userId", response.data.userId);
+			states.setUserId(response.data.userId)
 
-			goToFeedPage(navigate);
+			if (response.status == 201) {
+				goToFeedPage(navigate);
+			}
+
 
 		} catch (error) {
-			setErro(error.response.data);
+			console.log(error);
+			if (error.response.status == 400){
+				setErro('Informações invalidas');
+			} else if (error.response.status == 409){
+				setErro('Email já cadastrado');
+			}
 		}
 	};
+	// TODO validar inputs
+	// useEffect (() => {
+	// 	if (
+	// 		//regex aqui)
+	// 	) {
+	// 		//ok
+	// 	} else {
+	// 		//set error, senha invalida
+	// 	}
+	// }, [password])
 
 	return (
 		<>
@@ -62,28 +87,31 @@ export default function SignUpPage() {
 			</StyledHeader>
 			<StyledMainContainer>
 				<StyledTitle>Olá, bem-vindo ao LabEddit ;)</StyledTitle>
-				<StyledError>{erro}</StyledError>
 				<StyledForm onSubmit={handleSubmit}>
-					<StyledButtonsContainer>
+					<StyledError>{erro}</StyledError>
+					<StyledInputContainer>
 						<Input
 							placeHolder="Nome"
 							type="text"
 							value={name}
 							setValue={setName}
+							required
 						/>
 						<Input
 							placeHolder="E-mail"
 							type="email"
 							value={email}
 							setValue={setEmail}
+							required
 						/>
 						<Input
 							placeHolder="Senha"
 							type="password"
 							value={password}
 							setValue={setPassword}
+							required
 						/>
-					</StyledButtonsContainer>
+					</StyledInputContainer>
 					<StyledAgreementContainer>
 						<StyledText>
 							Ao continuar, você concorda com o nosso{' '}
@@ -97,7 +125,7 @@ export default function SignUpPage() {
 								legais no Labeddit
 							</StyledText>
 						</StyledSubscriptionContainer>
-						<StyledSignUpButton onClick={handleSubmit}>Cadastrar</StyledSignUpButton>
+						<StyledSignUpButton>Cadastrar</StyledSignUpButton>
 					</StyledAgreementContainer>
 				</StyledForm>
 			</StyledMainContainer>
