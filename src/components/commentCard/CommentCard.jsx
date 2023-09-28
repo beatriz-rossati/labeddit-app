@@ -28,7 +28,7 @@ export default function CommentCard({ comment }) { //TODO: esse 'comment' tá vi
 	const [editing, setEditing] = useState(false);
 	const [userLike, setUserLike] = useState(null);
 	const [showConfirmation, setShowConfirmation] = useState(false);
-	const isCurrentUserCommentCreator = states.userId === comment.creator.id;
+	const isCurrentUserCommentCreator = localStorage.getItem("userId") === comment.creator.id;
 
 	const checkLike = async () => {
 		try {

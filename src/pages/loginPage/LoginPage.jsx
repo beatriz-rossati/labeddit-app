@@ -15,15 +15,17 @@ import {
 import Input from '../../components/input/Input';
 import { useNavigate } from 'react-router-dom';
 import { goToSignupPage, goToFeedPage } from '../../routes/coordinator';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../constants/BASE_URL';
+import { GlobalContext } from '../../context/GlobalContext';
 
 export default function LoginPage() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [erro, setErro] = useState('');
 	const navigate = useNavigate();
+	const { states } = useContext(GlobalContext);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -36,6 +38,8 @@ export default function LoginPage() {
 
 			const response = await axios.post(`${BASE_URL}/users/login`, body);
 			localStorage.setItem("token", response.data.token);
+			localStorage.setItem("userId", response.data.userId);
+			states.setUserId(response.data.userId)
 
 			goToFeedPage(navigate);
 		} catch (error) {

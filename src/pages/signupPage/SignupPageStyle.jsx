@@ -58,7 +58,7 @@ export const StyledForm = styled.form`
 	}
 `;
 
-export const StyledButtonsContainer = styled.div`
+export const StyledInputContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	row-gap: 8px;
