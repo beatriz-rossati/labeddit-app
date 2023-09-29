@@ -1,5 +1,6 @@
-### Link do deploy [aqui](https://github.com/beatriz-rossati/labeddit-service) 
+####  Labeddit website: https://labeddit-beatriz-rossati.netlify.app/ 
 
-### Repositório do labeddit-backend [aqui](https://github.com/beatriz-rossati/labeddit-service).
 
-### Documentação da API [aqui](https://labeddit-service.onrender.com/documentation/)
+#### Repositório do labeddit-service (backend): https://github.com/beatriz-rossati/labeddit-service.
+
+#### Documentação da API: https://labeddit-service.onrender.com/documentation/
